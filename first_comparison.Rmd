@@ -1,0 +1,21 @@
+---
+title: "Deep Wide Model vs Fixed Effects"
+output: html_notebook
+---
+
+## Introduction
+
+In this analysis we'll compare the ability of deep learning and traditional fixed effects models to predict changes in small business loans.
+
+## The Data
+
+## Methods
+
+### Fixed-Effects models
+
+
+### Deep and Wide Model
+
+## Results
+
+## Conclusion
