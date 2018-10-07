@@ -59,9 +59,6 @@ panel <- panel[complete.cases(panel), ]
 
 ## create orthogonalized total equity variable
 panel$TE_orthogonal <- lm(panel$TETA_lagged_1_year ~ panel$t1_LR_lagged_1_year)$resid
-
-
-
 ```
 
 <!-- add summary statistics tables -->
@@ -86,7 +83,7 @@ The workhorses of traditional panel data econometrics are the fixed and random e
 
 We estimate the parameters of the following fixed effects model:
 
-```{r cache=TRUE, results='asis'}
+```{r cache=TRUE, results='asis', eval=FALSE}
 FEmodel1 <- plm(totSBloans_Delt ~  t1_LR_lagged_1_year + + I(t1_LR_lagged_1_year * african_am_ind) + I(t1_LR_lagged_1_year * hispanic_ind) + TETA_lagged_1_year + tot_SB_loans_TA_lagged_1 + ROA_lagged_1 + NPA_TA_lagged_1 + I(log(train$total_assets_lagged_1_year)) + TD_TA_lagged_1 + post_crisis_ind + fin_crisis_ind + de_novo, data = train, model = "within", effect = "individual")
 
 summary(FEmodel1)
@@ -100,12 +97,16 @@ FEmodel3 <- plm(totSBloans_Delt ~  t1_LR_lagged_1_year + I(t1_LR_lagged_1_year *
 summary(FEmodel3)
 ```
 
-```{r fe_output_table, eval=TRUE, results="asis"}
+```{r fe_output_table, eval=FALSE, results="asis"}
 stargazer(FEmodel1, FEmodel2, FEmodel3, covariate.labels = c("T1LR", "T1LR * AA", "T1LR * His", "TE", "Small Business Loans", "ROA", "NPA", "ln(TA)", "Deposits", "Post Crisis", "Fin Crisis", "De Novo", "ln(TA) * ROA", "ln(TA) * NPA"), dep.var.labels = "% Change in Amt. SB Loans", digits = 3, no.space=TRUE, header=FALSE, type='latex', omit.stat=c("LL"), title = "All Banks: Determinants of the % Change in the Amount of Small-Business Loans", intercept.bottom = TRUE, notes = "Results are from fixed-effects models with bank fixed effects, for the years 2001 through 2017.  Data are quarterly.  The dependent variable is percent change in the amount of small-business loans.  Small-Business loans are defined as the sum of commercial, industrial, and commercial real-estate loans.  All variables are lagged one year relative to the dependent variable.")
 
 ```
 
 The model is estimated using the plm package in the R programming language.  Estimation is done via maximum likelihood.
+
+#### Prediction with the Fixed Effects Models
+
+
 
 ### Deep and Wide Model
 
@@ -127,13 +128,6 @@ panel_input_fn <- function(data, num_epochs = 1) {
 ```
 
 ```{r eval=TRUE}
-cols_linear_feature <- feature_columns(
-    column_numeric("tot_SB_loans_TA_lagged_1"),
-    column_numeric("NPA_TA_lagged_1"),
-    column_numeric("log_TA_lagged_1"),
-    column_numeric("TD_TA_lagged_1"),
-    column_numeric("ROA_lagged_1")
-    )
 
 cols_dnn_feature <- feature_columns(
     column_numeric("t1_LR_lagged_1_year"),
@@ -142,17 +136,22 @@ cols_dnn_feature <- feature_columns(
     column_numeric("log_TA_ROA"),
     column_numeric("log_TA_NPA")
     )
+
+cols_linear_feature <- feature_columns(
+    column_numeric("tot_SB_loans_TA_lagged_1"),
+    column_numeric("NPA_TA_lagged_1"),
+    column_numeric("log_TA_lagged_1"),
+    column_numeric("TD_TA_lagged_1"),
+    column_numeric("ROA_lagged_1")
+    )
+
 ```
 
-```{r eval=TRUE}
+```{r train_and_eval}
 model1 <- dnn_linear_combined_regressor(linear_feature_columns = cols_linear_feature, dnn_feature_columns = cols_dnn_feature, dnn_hidden_units = c(100, 50))
-```
 
-```{r message=TRUE, error=FALSE, warning=FALSE, eval=TRUE}
 model1 %>% train(panel_input_fn(train, num_epochs = 10))
-```
 
-```{r message=TRUE, error=FALSE, warning=FALSE, eval=TRUE}
 model1 %>% evaluate(panel_input_fn(test))
 ```
 
