@@ -1,0 +1,488 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage{hyperref}
+\hypersetup{unicode=true,
+            pdftitle={Predicting Changes in Small Business Lending: Fixed-Effects Versus Machine Learning},
+            pdfauthor={Matt Brigida},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+%%% Use protect on footnotes to avoid problems with footnotes in titles
+\let\rmarkdownfootnote\footnote%
+\def\footnote{\protect\rmarkdownfootnote}
+
+%%% Change title format to be more compact
+\usepackage{titling}
+
+% Create subtitle command for use in maketitle
+\newcommand{\subtitle}[1]{
+  \posttitle{
+    \begin{center}\large#1\end{center}
+    }
+}
+
+\setlength{\droptitle}{-2em}
+  \title{Predicting Changes in Small Business Lending: Fixed-Effects Versus
+Machine Learning}
+  \pretitle{\vspace{\droptitle}\centering\huge}
+  \posttitle{\par}
+  \author{Matt Brigida}
+  \preauthor{\centering\large\emph}
+  \postauthor{\par}
+  \predate{\centering\large\emph}
+  \postdate{\par}
+  \date{October 1, 2018}
+
+\setlength\parindent{24pt}
+
+\begin{document}
+\maketitle
+\begin{abstract}
+This analysis\ldots{}..
+\end{abstract}
+
+\hypertarget{introduction}{%
+\subsection{Introduction}\label{introduction}}
+
+In this analysis we'll compare the ability of deep learning and
+traditional fixed effects models to predict changes in small business
+loans.
+
+The following code will load the libraries which we will use in this
+analysis.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(plm)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Loading required package: Formula
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(stargazer)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Please cite as:
+\end{verbatim}
+
+\begin{verbatim}
+##  Hlavac, Marek (2018). stargazer: Well-Formatted Regression and Summary Statistics Tables.
+\end{verbatim}
+
+\begin{verbatim}
+##  R package version 5.2.1. https://CRAN.R-project.org/package=stargazer
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(}\StringTok{"tfestimators"}\NormalTok{)}
+\KeywordTok{library}\NormalTok{(}\StringTok{"keras"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{the-data}{%
+\subsection{The Data}\label{the-data}}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{panel <-}\StringTok{ }\KeywordTok{readRDS}\NormalTok{(}\KeywordTok{url}\NormalTok{(}\StringTok{"https://github.com/Matt-Brigida/FFIEC_Call_Reports/blob/master/querying_data_and_analysis/analyses/panel_data_analysis/full_panel/1_panel_with_full_quarter_date/1_one_panel_all_models/full_panel.rds?raw=true"}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+The code below will apply filters to the data to exclude outliers.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cols <-}\StringTok{ }\KeywordTok{c}\NormalTok{(}\StringTok{"quarter"}\NormalTok{, }\StringTok{"totSBloans_Delt"}\NormalTok{, }\StringTok{"t1_LR_lagged_1_year"}\NormalTok{, }\StringTok{"tot_SB_loans_TA_lagged_1"}\NormalTok{, }\StringTok{"ROA_lagged_1"}\NormalTok{, }\StringTok{"NPA_TA_lagged_1"}\NormalTok{, }\StringTok{"total_assets_lagged_1_year"}\NormalTok{, }\StringTok{"TD_TA_lagged_1"}\NormalTok{, }\StringTok{"african_am_ind"}\NormalTok{, }\StringTok{"hispanic_ind"}\NormalTok{, }\StringTok{"de_novo"}\NormalTok{, }\StringTok{"TETA_lagged_1_year"}\NormalTok{, }\StringTok{"post_crisis_ind"}\NormalTok{, }\StringTok{"fin_crisis_ind"}\NormalTok{)}
+
+\NormalTok{panel <-}\StringTok{ }\NormalTok{panel[, cols]}
+
+\NormalTok{panel <-}\StringTok{ }\NormalTok{panel[panel}\OperatorTok{$}\NormalTok{totSBloans_Delt }\OperatorTok{<}\StringTok{ }\DecValTok{2}\NormalTok{, ]}
+\NormalTok{panel <-}\StringTok{ }\NormalTok{panel[panel}\OperatorTok{$}\NormalTok{t1_LR_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{<}\StringTok{ }\DecValTok{1}\NormalTok{, ]}
+\NormalTok{panel <-}\StringTok{ }\NormalTok{panel[panel}\OperatorTok{$}\NormalTok{TETA_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{<}\StringTok{ }\DecValTok{1}\NormalTok{, ]}
+
+\NormalTok{panel}\OperatorTok{$}\NormalTok{log_TA_lagged_}\DecValTok{1}\NormalTok{ <-}\StringTok{ }\KeywordTok{log}\NormalTok{(panel}\OperatorTok{$}\NormalTok{total_assets_lagged_}\DecValTok{1}\NormalTok{_year)}
+\NormalTok{panel}\OperatorTok{$}\NormalTok{aa_t1_int <-}\StringTok{ }\NormalTok{panel}\OperatorTok{$}\NormalTok{african_am_ind }\OperatorTok{*}\StringTok{ }\NormalTok{panel}\OperatorTok{$}\NormalTok{t1_LR_lagged_}\DecValTok{1}\NormalTok{_year}
+\NormalTok{panel}\OperatorTok{$}\NormalTok{h_t1_int <-}\StringTok{ }\NormalTok{panel}\OperatorTok{$}\NormalTok{hispanic_ind }\OperatorTok{*}\StringTok{ }\NormalTok{panel}\OperatorTok{$}\NormalTok{t1_LR_lagged_}\DecValTok{1}\NormalTok{_year}
+\NormalTok{panel}\OperatorTok{$}\NormalTok{log_TA_ROA <-}\StringTok{ }\KeywordTok{log}\NormalTok{(panel}\OperatorTok{$}\NormalTok{total_assets_lagged_}\DecValTok{1}\NormalTok{_year) }\OperatorTok{*}\StringTok{ }\NormalTok{panel}\OperatorTok{$}\NormalTok{ROA_lagged_}\DecValTok{1}
+\NormalTok{panel}\OperatorTok{$}\NormalTok{log_TA_NPA <-}\StringTok{ }\KeywordTok{log}\NormalTok{(panel}\OperatorTok{$}\NormalTok{total_assets_lagged_}\DecValTok{1}\NormalTok{_year) }\OperatorTok{*}\StringTok{ }\NormalTok{panel}\OperatorTok{$}\NormalTok{NPA_TA_lagged_}\DecValTok{1}
+
+
+\CommentTok{## get rid of NAs}
+
+\NormalTok{panel <-}\StringTok{ }\NormalTok{panel[}\KeywordTok{complete.cases}\NormalTok{(panel), ]}
+
+\CommentTok{## create orthogonalized total equity variable}
+\NormalTok{panel}\OperatorTok{$}\NormalTok{TE_orthogonal <-}\StringTok{ }\KeywordTok{lm}\NormalTok{(panel}\OperatorTok{$}\NormalTok{TETA_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{~}\StringTok{ }\NormalTok{panel}\OperatorTok{$}\NormalTok{t1_LR_lagged_}\DecValTok{1}\NormalTok{_year)}\OperatorTok{$}\NormalTok{resid}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{purpose-and-methods}{%
+\subsection{Purpose and Methods}\label{purpose-and-methods}}
+
+The goal of this analysis is first to predict the percent change in the
+amount, and number, of small business loans given a set of lagged
+explanatory variables. Second, we'll consider the ability of each method
+to explain the drivers of the change in small business loans.
+
+The workhorses of traditional panel data econometrics are the fixed and
+random effects models. In this section we will estimate a fixed effects
+model
+
+\hypertarget{models-and-results}{%
+\subsection{Models and Results}\label{models-and-results}}
+
+\hypertarget{fixed-effects-model}{%
+\subsubsection{Fixed-Effects Model}\label{fixed-effects-model}}
+
+We estimate the parameters of the following fixed effects model:
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{FEmodel1 <-}\StringTok{ }\KeywordTok{plm}\NormalTok{(totSBloans_Delt }\OperatorTok{~}\StringTok{  }\NormalTok{t1_LR_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{+}\StringTok{ }\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(t1_LR_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{*}\StringTok{ }\NormalTok{african_am_ind) }\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(t1_LR_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{*}\StringTok{ }\NormalTok{hispanic_ind) }\OperatorTok{+}\StringTok{ }\NormalTok{TETA_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{+}\StringTok{ }\NormalTok{tot_SB_loans_TA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\NormalTok{ROA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\NormalTok{NPA_TA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(}\KeywordTok{log}\NormalTok{(panel}\OperatorTok{$}\NormalTok{total_assets_lagged_}\DecValTok{1}\NormalTok{_year)) }\OperatorTok{+}\StringTok{ }\NormalTok{TD_TA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\NormalTok{post_crisis_ind }\OperatorTok{+}\StringTok{ }\NormalTok{fin_crisis_ind }\OperatorTok{+}\StringTok{ }\NormalTok{de_novo, }\DataTypeTok{data =}\NormalTok{ panel, }\DataTypeTok{model =} \StringTok{"within"}\NormalTok{, }\DataTypeTok{effect =} \StringTok{"individual"}\NormalTok{)}
+
+\KeywordTok{summary}\NormalTok{(FEmodel1)}
+\end{Highlighting}
+\end{Shaded}
+
+Oneway (individual) effect Within Model
+
+Call: plm(formula = totSBloans\_Delt \textasciitilde{}
+t1\_LR\_lagged\_1\_year + +I(t1\_LR\_lagged\_1\_year * african\_am\_ind)
++ I(t1\_LR\_lagged\_1\_year * hispanic\_ind) + TETA\_lagged\_1\_year +
+tot\_SB\_loans\_TA\_lagged\_1 + ROA\_lagged\_1 + NPA\_TA\_lagged\_1 +
+I(log(panel\$total\_assets\_lagged\_1\_year)) + TD\_TA\_lagged\_1 +
+post\_crisis\_ind + fin\_crisis\_ind + de\_novo, data = panel, effect =
+``individual'', model = ``within'')
+
+Unbalanced Panel: n = 9739, T = 1-36, N = 209528
+
+Residuals: Min. 1st Qu. Median 3rd Qu. Max. -3.008107 -0.086830 0.018885
+0.133077 2.283419
+
+Coefficients: Estimate Std. Error t-value t1\_LR\_lagged\_1\_year
+0.3816665 0.0303559 12.5730 I(t1\_LR\_lagged\_1\_year *
+african\_am\_ind) 0.7887476 0.2702534 2.9185 I(t1\_LR\_lagged\_1\_year *
+hispanic\_ind) 0.6917989 0.1547040 4.4718 TETA\_lagged\_1\_year
+0.1881313 0.0495314 3.7982 tot\_SB\_loans\_TA\_lagged\_1 -0.5308933
+0.0281330 -18.8708 ROA\_lagged\_1 4.1342099 0.1151375 35.9067
+NPA\_TA\_lagged\_1 -3.7764486 0.1822779 -20.7181
+I(log(panel\(total_assets_lagged_1_year)) -0.2266716 0.0025972 -87.2766 TD_TA_lagged_1 -0.3517275 0.0221248 -15.8974 post_crisis_ind 0.0214673 0.0017485 12.2773 fin_crisis_ind -0.0010580 0.0021875 -0.4837 de_novo 0.2187735 0.0050212 43.5700  Pr(>|t|) t1_LR_lagged_1_year < 2.2e-16 *** I(t1_LR_lagged_1_year * african_am_ind) 0.0035170 ** I(t1_LR_lagged_1_year * hispanic_ind) 7.762e-06 *** TETA_lagged_1_year 0.0001458 *** tot_SB_loans_TA_lagged_1 < 2.2e-16 *** ROA_lagged_1 < 2.2e-16 *** NPA_TA_lagged_1 < 2.2e-16 *** I(log(panel\)total\_assets\_lagged\_1\_year))
+\textless{} 2.2e-16 \textbf{\emph{ TD\_TA\_lagged\_1 \textless{} 2.2e-16
+}} post\_crisis\_ind \textless{} 2.2e-16 \textbf{\emph{ fin\_crisis\_ind
+0.6286299\\
+de\_novo \textless{} 2.2e-16 }} --- Signif. codes: 0 `\emph{\textbf{'
+0.001 '}' 0.01 '}' 0.05 `.' 0.1 ' ' 1
+
+Total Sum of Squares: 22653 Residual Sum of Squares: 20840 R-Squared:
+0.080047 Adj. R-Squared: 0.035149 F-statistic: 1448.59 on 12 and 199777
+DF, p-value: \textless{} 2.22e-16
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{FEmodel2 <-}\StringTok{ }\KeywordTok{plm}\NormalTok{(totSBloans_Delt }\OperatorTok{~}\StringTok{  }\NormalTok{t1_LR_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(t1_LR_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{*}\StringTok{ }\NormalTok{african_am_ind) }\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(t1_LR_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{*}\StringTok{ }\NormalTok{hispanic_ind) }\OperatorTok{+}\StringTok{ }\NormalTok{TETA_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{+}\StringTok{ }\NormalTok{tot_SB_loans_TA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\NormalTok{ROA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\NormalTok{NPA_TA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(}\KeywordTok{log}\NormalTok{(panel}\OperatorTok{$}\NormalTok{total_assets_lagged_}\DecValTok{1}\NormalTok{_year))  }\OperatorTok{+}\StringTok{ }\NormalTok{TD_TA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\NormalTok{post_crisis_ind }\OperatorTok{+}\StringTok{ }\NormalTok{fin_crisis_ind }\OperatorTok{+}\StringTok{ }\NormalTok{de_novo }\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(}\KeywordTok{log}\NormalTok{(panel}\OperatorTok{$}\NormalTok{total_assets_lagged_}\DecValTok{1}\NormalTok{_year) }\OperatorTok{*}\StringTok{ }\NormalTok{ROA_lagged_}\DecValTok{1}\NormalTok{), }\DataTypeTok{data =}\NormalTok{ panel, }\DataTypeTok{model =} \StringTok{"within"}\NormalTok{, }\DataTypeTok{effect =} \StringTok{"individual"}\NormalTok{)}
+
+\KeywordTok{summary}\NormalTok{(FEmodel2)}
+\end{Highlighting}
+\end{Shaded}
+
+Oneway (individual) effect Within Model
+
+Call: plm(formula = totSBloans\_Delt \textasciitilde{}
+t1\_LR\_lagged\_1\_year + I(t1\_LR\_lagged\_1\_year * african\_am\_ind)
++ I(t1\_LR\_lagged\_1\_year * hispanic\_ind) + TETA\_lagged\_1\_year +
+tot\_SB\_loans\_TA\_lagged\_1 + ROA\_lagged\_1 + NPA\_TA\_lagged\_1 +
+I(log(panel\(total_assets_lagged_1_year)) +  TD_TA_lagged_1 + post_crisis_ind + fin_crisis_ind + de_novo +  I(log(panel\)total\_assets\_lagged\_1\_year)
+* ROA\_lagged\_1), data = panel, effect = ``individual'', model =
+``within'')
+
+Unbalanced Panel: n = 9739, T = 1-36, N = 209528
+
+Residuals: Min. 1st Qu. Median 3rd Qu. Max. -2.918520 -0.086964 0.018931
+0.132990 2.273150
+
+Coefficients: Estimate t1\_LR\_lagged\_1\_year 0.37629419
+I(t1\_LR\_lagged\_1\_year * african\_am\_ind) 0.79467678
+I(t1\_LR\_lagged\_1\_year * hispanic\_ind) 0.64942814
+TETA\_lagged\_1\_year 0.13761758 tot\_SB\_loans\_TA\_lagged\_1
+-0.53208938 ROA\_lagged\_1 -7.37808729 NPA\_TA\_lagged\_1 -3.75967262
+I(log(panel\(total_assets_lagged_1_year)) -0.22918820 TD_TA_lagged_1 -0.35006207 post_crisis_ind 0.02118858 fin_crisis_ind -0.00012801 de_novo 0.21704108 I(log(panel\)total\_assets\_lagged\_1\_year)
+* ROA\_lagged\_1) 0.96036115 Std. Error t1\_LR\_lagged\_1\_year
+0.03034999 I(t1\_LR\_lagged\_1\_year * african\_am\_ind) 0.27016783
+I(t1\_LR\_lagged\_1\_year * hispanic\_ind) 0.15469999
+TETA\_lagged\_1\_year 0.04971608 tot\_SB\_loans\_TA\_lagged\_1
+0.02812428 ROA\_lagged\_1 1.02287508 NPA\_TA\_lagged\_1 0.18222591
+I(log(panel\(total_assets_lagged_1_year)) 0.00260583 TD_TA_lagged_1 0.02211827 post_crisis_ind 0.00174814 fin_crisis_ind 0.00218836 de_novo 0.00502193 I(log(panel\)total\_assets\_lagged\_1\_year)
+* ROA\_lagged\_1) 0.08478676 t-value
+Pr(\textgreater{}\textbar{}t\textbar{}) t1\_LR\_lagged\_1\_year 12.3985
+\textless{} 2.2e-16 I(t1\_LR\_lagged\_1\_year * african\_am\_ind) 2.9414
+0.003267 I(t1\_LR\_lagged\_1\_year * hispanic\_ind) 4.1980 2.694e-05
+TETA\_lagged\_1\_year 2.7681 0.005639 tot\_SB\_loans\_TA\_lagged\_1
+-18.9192 \textless{} 2.2e-16 ROA\_lagged\_1 -7.2131 5.489e-13
+NPA\_TA\_lagged\_1 -20.6319 \textless{} 2.2e-16
+I(log(panel\(total_assets_lagged_1_year)) -87.9522 < 2.2e-16 TD_TA_lagged_1 -15.8268 < 2.2e-16 post_crisis_ind 12.1206 < 2.2e-16 fin_crisis_ind -0.0585 0.953353 de_novo 43.2187 < 2.2e-16 I(log(panel\)total\_assets\_lagged\_1\_year)
+* ROA\_lagged\_1) 11.3268 \textless{} 2.2e-16
+
+t1\_LR\_lagged\_1\_year \textbf{\emph{ I(t1\_LR\_lagged\_1\_year }
+african\_am\_ind) } I(t1\_LR\_lagged\_1\_year * hispanic\_ind)
+\emph{\textbf{ TETA\_lagged\_1\_year } tot\_SB\_loans\_TA\_lagged\_1
+}\textbf{ ROA\_lagged\_1 }\emph{ NPA\_TA\_lagged\_1 }\textbf{
+I(log(panel\(total_assets_lagged_1_year)) *** TD_TA_lagged_1 *** post_crisis_ind *** fin_crisis_ind de_novo *** I(log(panel\)total\_assets\_lagged\_1\_year)
+* ROA\_lagged\_1) }* --- Signif. codes: 0 `\emph{\textbf{' 0.001 '}'
+0.01 '}' 0.05 `.' 0.1 ' ' 1
+
+Total Sum of Squares: 22653 Residual Sum of Squares: 20826 R-Squared:
+0.080638 Adj. R-Squared: 0.035764 F-statistic: 1347.88 on 13 and 199776
+DF, p-value: \textless{} 2.22e-16
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{FEmodel3 <-}\StringTok{ }\KeywordTok{plm}\NormalTok{(totSBloans_Delt }\OperatorTok{~}\StringTok{  }\NormalTok{t1_LR_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(t1_LR_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{*}\StringTok{ }\NormalTok{african_am_ind) }\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(t1_LR_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{*}\StringTok{ }\NormalTok{hispanic_ind) }\OperatorTok{+}\StringTok{ }\NormalTok{TETA_lagged_}\DecValTok{1}\NormalTok{_year }\OperatorTok{+}\StringTok{ }\NormalTok{tot_SB_loans_TA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\NormalTok{ROA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\NormalTok{NPA_TA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(}\KeywordTok{log}\NormalTok{(panel}\OperatorTok{$}\NormalTok{total_assets_lagged_}\DecValTok{1}\NormalTok{_year)) }\OperatorTok{+}\StringTok{ }\NormalTok{TD_TA_lagged_}\DecValTok{1} \OperatorTok{+}\StringTok{ }\NormalTok{post_crisis_ind }\OperatorTok{+}\StringTok{ }\NormalTok{fin_crisis_ind }\OperatorTok{+}\StringTok{ }\NormalTok{de_novo }\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(}\KeywordTok{log}\NormalTok{(panel}\OperatorTok{$}\NormalTok{total_assets_lagged_}\DecValTok{1}\NormalTok{_year) }\OperatorTok{*}\StringTok{ }\NormalTok{ROA_lagged_}\DecValTok{1}\NormalTok{) }\OperatorTok{+}\StringTok{ }\KeywordTok{I}\NormalTok{(}\KeywordTok{log}\NormalTok{(panel}\OperatorTok{$}\NormalTok{total_assets_lagged_}\DecValTok{1}\NormalTok{_year) }\OperatorTok{*}\StringTok{ }\NormalTok{NPA_TA_lagged_}\DecValTok{1}\NormalTok{), }\DataTypeTok{data =}\NormalTok{ panel, }\DataTypeTok{model =} \StringTok{"within"}\NormalTok{, }\DataTypeTok{effect =} \StringTok{"individual"}\NormalTok{)}
+
+\KeywordTok{summary}\NormalTok{(FEmodel3)}
+\end{Highlighting}
+\end{Shaded}
+
+Oneway (individual) effect Within Model
+
+Call: plm(formula = totSBloans\_Delt \textasciitilde{}
+t1\_LR\_lagged\_1\_year + I(t1\_LR\_lagged\_1\_year * african\_am\_ind)
++ I(t1\_LR\_lagged\_1\_year * hispanic\_ind) + TETA\_lagged\_1\_year +
+tot\_SB\_loans\_TA\_lagged\_1 + ROA\_lagged\_1 + NPA\_TA\_lagged\_1 +
+I(log(panel\(total_assets_lagged_1_year)) +  TD_TA_lagged_1 + post_crisis_ind + fin_crisis_ind + de_novo +  I(log(panel\)total\_assets\_lagged\_1\_year)
+* ROA\_lagged\_1) + I(log(panel\$total\_assets\_lagged\_1\_year) *
+NPA\_TA\_lagged\_1), data = panel, effect = ``individual'', model =
+``within'')
+
+Unbalanced Panel: n = 9739, T = 1-36, N = 209528
+
+Residuals: Min. 1st Qu. Median 3rd Qu. Max. -2.927314 -0.086920 0.018855
+0.132992 2.273799
+
+Coefficients: Estimate t1\_LR\_lagged\_1\_year 0.37740143
+I(t1\_LR\_lagged\_1\_year * african\_am\_ind) 0.78102615
+I(t1\_LR\_lagged\_1\_year * hispanic\_ind) 0.64785189
+TETA\_lagged\_1\_year 0.13930344 tot\_SB\_loans\_TA\_lagged\_1
+-0.53483035 ROA\_lagged\_1 -6.83101464 NPA\_TA\_lagged\_1 3.42425708
+I(log(panel\(total_assets_lagged_1_year)) -0.22754845 TD_TA_lagged_1 -0.35085708 post_crisis_ind 0.02132528 fin_crisis_ind 0.00014539 de_novo 0.21736440 I(log(panel\)total\_assets\_lagged\_1\_year)
+* ROA\_lagged\_1) 0.91302848
+I(log(panel\(total_assets_lagged_1_year) * NPA_TA_lagged_1) -0.61338597  Std. Error t1_LR_lagged_1_year 0.03035055 I(t1_LR_lagged_1_year * african_am_ind) 0.27018520 I(t1_LR_lagged_1_year * hispanic_ind) 0.15469579 TETA_lagged_1_year 0.04971667 tot_SB_loans_TA_lagged_1 0.02813338 ROA_lagged_1 1.03371146 NPA_TA_lagged_1 1.97163612 I(log(panel\)total\_assets\_lagged\_1\_year))
+0.00264399 TD\_TA\_lagged\_1 0.02211865 post\_crisis\_ind 0.00174849
+fin\_crisis\_ind 0.00218957 de\_novo 0.00502255
+I(log(panel\(total_assets_lagged_1_year) * ROA_lagged_1) 0.08576515 I(log(panel\)total\_assets\_lagged\_1\_year)
+* NPA\_TA\_lagged\_1) 0.16762384 t-value t1\_LR\_lagged\_1\_year 12.4347
+I(t1\_LR\_lagged\_1\_year * african\_am\_ind) 2.8907
+I(t1\_LR\_lagged\_1\_year * hispanic\_ind) 4.1879 TETA\_lagged\_1\_year
+2.8019 tot\_SB\_loans\_TA\_lagged\_1 -19.0105 ROA\_lagged\_1 -6.6082
+NPA\_TA\_lagged\_1 1.7368
+I(log(panel\(total_assets_lagged_1_year)) -86.0624 TD_TA_lagged_1 -15.8625 post_crisis_ind 12.1964 fin_crisis_ind 0.0664 de_novo 43.2777 I(log(panel\)total\_assets\_lagged\_1\_year)
+* ROA\_lagged\_1) 10.6457
+I(log(panel\(total_assets_lagged_1_year) * NPA_TA_lagged_1) -3.6593  Pr(>|t|) t1_LR_lagged_1_year < 2.2e-16 *** I(t1_LR_lagged_1_year * african_am_ind) 0.003844 ** I(t1_LR_lagged_1_year * hispanic_ind) 2.817e-05 *** TETA_lagged_1_year 0.005080 ** tot_SB_loans_TA_lagged_1 < 2.2e-16 *** ROA_lagged_1 3.899e-11 *** NPA_TA_lagged_1 0.082431 . I(log(panel\)total\_assets\_lagged\_1\_year))
+\textless{} 2.2e-16 \textbf{\emph{ TD\_TA\_lagged\_1 \textless{} 2.2e-16
+}} post\_crisis\_ind \textless{} 2.2e-16 \textbf{\emph{ fin\_crisis\_ind
+0.947059\\
+de\_novo \textless{} 2.2e-16 }}
+I(log(panel\(total_assets_lagged_1_year) * ROA_lagged_1) < 2.2e-16 *** I(log(panel\)total\_assets\_lagged\_1\_year)
+* NPA\_TA\_lagged\_1) 0.000253 *** --- Signif. codes: 0 `\emph{\textbf{'
+0.001 '}' 0.01 '}' 0.05 `.' 0.1 ' ' 1
+
+Total Sum of Squares: 22653 Residual Sum of Squares: 20825 R-Squared:
+0.080699 Adj. R-Squared: 0.035824 F-statistic: 1252.64 on 14 and 199775
+DF, p-value: \textless{} 2.22e-16
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{stargazer}\NormalTok{(FEmodel1, FEmodel2, FEmodel3, }\DataTypeTok{covariate.labels =} \KeywordTok{c}\NormalTok{(}\StringTok{"T1LR"}\NormalTok{, }\StringTok{"T1LR * AA"}\NormalTok{, }\StringTok{"T1LR * His"}\NormalTok{, }\StringTok{"TE"}\NormalTok{, }\StringTok{"Small Business Loans"}\NormalTok{, }\StringTok{"ROA"}\NormalTok{, }\StringTok{"NPA"}\NormalTok{, }\StringTok{"ln(TA)"}\NormalTok{, }\StringTok{"Deposits"}\NormalTok{, }\StringTok{"Post Crisis"}\NormalTok{, }\StringTok{"Fin Crisis"}\NormalTok{, }\StringTok{"De Novo"}\NormalTok{, }\StringTok{"ln(TA) * ROA"}\NormalTok{, }\StringTok{"ln(TA) * NPA"}\NormalTok{), }\DataTypeTok{dep.var.labels =} \StringTok{"% Change in Amt. SB Loans"}\NormalTok{, }\DataTypeTok{digits =} \DecValTok{3}\NormalTok{, }\DataTypeTok{no.space=}\OtherTok{TRUE}\NormalTok{, }\DataTypeTok{header=}\OtherTok{FALSE}\NormalTok{, }\DataTypeTok{type=}\StringTok{'latex'}\NormalTok{, }\DataTypeTok{omit.stat=}\KeywordTok{c}\NormalTok{(}\StringTok{"LL"}\NormalTok{), }\DataTypeTok{title =} \StringTok{"All Banks: Determinants of the % Change in the Amount of Small-Business Loans"}\NormalTok{, }\DataTypeTok{intercept.bottom =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{notes =} \StringTok{"Results are from fixed-effects models with bank fixed effects, for the years 2001 through 2017.  Data are quarterly.  The dependent variable is percent change in the amount of small-business loans.  Small-Business loans are defined as the sum of commercial, industrial, and commercial real-estate loans.  All variables are lagged one year relative to the dependent variable."}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+The model is estimated using the plm package in the R programming
+language. Estimation is done via maximum likelihood.
+
+\hypertarget{deep-and-wide-model}{%
+\subsubsection{Deep and Wide Model}\label{deep-and-wide-model}}
+
+We estimate the parameters of a deep and wide neural net model. The
+model is implemented in Keras and using Tensorflow as a backend. We
+first load the tensorflow and keras libraries and the data.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{## create train and test set-----}
+\NormalTok{indices <-}\StringTok{ }\KeywordTok{sample}\NormalTok{(}\DecValTok{1}\OperatorTok{:}\KeywordTok{nrow}\NormalTok{(panel), }\DataTypeTok{size =} \FloatTok{0.80} \OperatorTok{*}\StringTok{ }\KeywordTok{nrow}\NormalTok{(panel))}
+\NormalTok{train <-}\StringTok{ }\NormalTok{panel[indices, ]}
+\NormalTok{test  <-}\StringTok{ }\NormalTok{panel[}\OperatorTok{-}\NormalTok{indices, ]}
+\end{Highlighting}
+\end{Shaded}
+
+Input function
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{## return an input_fn for a given subset of data}
+\NormalTok{panel_input_fn <-}\StringTok{ }\ControlFlowTok{function}\NormalTok{(data, }\DataTypeTok{num_epochs =} \DecValTok{1}\NormalTok{) \{}
+  \KeywordTok{input_fn}\NormalTok{(data,}
+           \DataTypeTok{features =} \KeywordTok{c}\NormalTok{(}\StringTok{"t1_LR_lagged_1_year"}\NormalTok{, }\StringTok{"tot_SB_loans_TA_lagged_1"}\NormalTok{, }\StringTok{"ROA_lagged_1"}\NormalTok{, }\StringTok{"NPA_TA_lagged_1"}\NormalTok{, }\StringTok{"TD_TA_lagged_1"}\NormalTok{, }\StringTok{"log_TA_lagged_1"}\NormalTok{, }\StringTok{"aa_t1_int"}\NormalTok{, }\StringTok{"h_t1_int"}\NormalTok{, }\StringTok{"log_TA_ROA"}\NormalTok{, }\StringTok{"log_TA_NPA"}\NormalTok{),}
+           \DataTypeTok{response =} \StringTok{"totSBloans_Delt"}\NormalTok{,}
+           \DataTypeTok{batch_size =} \DecValTok{32}\NormalTok{,}
+           \DataTypeTok{num_epochs =}\NormalTok{ num_epochs)}
+\NormalTok{\}}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{cols_linear_feature <-}\StringTok{ }\KeywordTok{feature_columns}\NormalTok{(}
+    \KeywordTok{column_numeric}\NormalTok{(}\StringTok{"tot_SB_loans_TA_lagged_1"}\NormalTok{),}
+    \KeywordTok{column_numeric}\NormalTok{(}\StringTok{"NPA_TA_lagged_1"}\NormalTok{),}
+    \KeywordTok{column_numeric}\NormalTok{(}\StringTok{"log_TA_lagged_1"}\NormalTok{),}
+    \KeywordTok{column_numeric}\NormalTok{(}\StringTok{"TD_TA_lagged_1"}\NormalTok{),}
+    \KeywordTok{column_numeric}\NormalTok{(}\StringTok{"ROA_lagged_1"}\NormalTok{)}
+\NormalTok{    )}
+
+\NormalTok{cols_dnn_feature <-}\StringTok{ }\KeywordTok{feature_columns}\NormalTok{(}
+    \KeywordTok{column_numeric}\NormalTok{(}\StringTok{"t1_LR_lagged_1_year"}\NormalTok{),}
+    \KeywordTok{column_numeric}\NormalTok{(}\StringTok{"aa_t1_int"}\NormalTok{),}
+    \KeywordTok{column_numeric}\NormalTok{(}\StringTok{"h_t1_int"}\NormalTok{),}
+    \KeywordTok{column_numeric}\NormalTok{(}\StringTok{"log_TA_ROA"}\NormalTok{),}
+    \KeywordTok{column_numeric}\NormalTok{(}\StringTok{"log_TA_NPA"}\NormalTok{)}
+\NormalTok{    )}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model1 <-}\StringTok{ }\KeywordTok{dnn_linear_combined_regressor}\NormalTok{(}\DataTypeTok{linear_feature_columns =}\NormalTok{ cols_linear_feature, }\DataTypeTok{dnn_feature_columns =}\NormalTok{ cols_dnn_feature, }\DataTypeTok{dnn_hidden_units =} \KeywordTok{c}\NormalTok{(}\DecValTok{100}\NormalTok{, }\DecValTok{50}\NormalTok{))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{model1 }\OperatorTok{%>%}\StringTok{ }\KeywordTok{train}\NormalTok{(}\KeywordTok{panel_input_fn}\NormalTok{(train, }\DataTypeTok{num_epochs =} \DecValTok{10}\NormalTok{))}
+\NormalTok{model1 }\OperatorTok{%>%}\StringTok{ }\KeywordTok{evaluate}\NormalTok{(}\KeywordTok{panel_input_fn}\NormalTok{(test))}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{obs <-}\StringTok{ }\NormalTok{panel[(}\KeywordTok{dim}\NormalTok{(panel)[}\DecValTok{1}\NormalTok{] }\OperatorTok{-}\StringTok{ }\DecValTok{100}\NormalTok{)}\OperatorTok{:}\KeywordTok{dim}\NormalTok{(panel)[}\DecValTok{1}\NormalTok{], ]}
+\NormalTok{preds1 <-}\StringTok{ }\NormalTok{model1 }\OperatorTok{%>%}\StringTok{ }\KeywordTok{predict}\NormalTok{(}\KeywordTok{panel_input_fn}\NormalTok{(obs))}
+
+\NormalTok{true_values1 <-}\StringTok{ }\NormalTok{obs}\OperatorTok{$}\NormalTok{totSBloans_Delt}
+\NormalTok{predictions1 <-}\StringTok{ }\KeywordTok{unlist}\NormalTok{(preds1}\OperatorTok{$}\NormalTok{predictions)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{cor.test}\NormalTok{(}\KeywordTok{unlist}\NormalTok{(preds1}\OperatorTok{$}\NormalTok{predictions), obs}\OperatorTok{$}\NormalTok{totSBloans_Delt)}
+\NormalTok{sq_errors1 <-}\StringTok{ }\NormalTok{(true_values1 }\OperatorTok{-}\StringTok{ }\NormalTok{predictions1)}\OperatorTok{^}\DecValTok{2}
+\NormalTok{avg_error1 <-}\StringTok{ }\KeywordTok{sum}\NormalTok{(sq_errors1) }\OperatorTok{/}\StringTok{ }\NormalTok{(}\KeywordTok{length}\NormalTok{(sq_errors1))}
+\NormalTok{rmse <-}\StringTok{ }\KeywordTok{sqrt}\NormalTok{(avg_error1)}
+\NormalTok{rmse}
+\end{Highlighting}
+\end{Shaded}
+
+\hypertarget{conclusion}{%
+\subsection{Conclusion}\label{conclusion}}
+
+
+\end{document}
