@@ -16,23 +16,23 @@ output:
     number_sections: yes
 ---
 
-## Introduction
+# Introduction
 
 In this analysis we'll compare the ability of deep learning and traditional fixed effects models to predict changes in small business loans.
 
 The following code will load the libraries which we will use in this analysis.
 
 ```{r libraries}
+library(keras)
 library(plm)
 library(stargazer)
 library(tfestimators)
-library(keras)
 ```
 
-## The Data
+# The Data
 
 ```{r dataload, cache=TRUE}
-panel <- readRDS(url("https://github.com/Matt-Brigida/FFIEC_Call_Reports/blob/master/querying_data_and_analysis/analyses/panel_data_analysis/full_panel/1_panel_with_full_quarter_date/1_one_panel_all_models/full_panel.rds?raw=true"))
+panel <- readRDS(url("https://github.com/Matt-Brigida/FFIEC_Call_Reports/raw/master/1_querying_data_and_analysis/analyses/panel_data_analysis/full_panel/1_panel_with_full_quarter_date/1_one_panel_all_models/full_panel.rds"))
 ```
 
 The code below will apply filters to the data to exclude outliers.  
@@ -71,15 +71,19 @@ test  <- panel[-indices, ]
 
 ```
 
-## Purpose and Methods
+# Purpose and Methods
 
 The goal of this analysis is first to predict the percent change in the amount, and number, of small business loans given a set of lagged explanatory variables.  Second, we'll consider the ability of each method to explain the drivers of the change in small business loans.
 
-The workhorses of traditional panel data econometrics are the fixed and random effects models. In this section we will estimate a fixed effects model
+The workhorses of traditional panel data econometrics are the fixed and random effects models. In this section we will test for which model is appropriate and ultimately estimate the fixed effects model specification.
 
-## Models and Results
+# Models and Results
 
-### Fixed-Effects Model
+## Tests for Fixed versus Random Effects
+
+We use the Hausman test to determine whether [TODO add test]
+
+## Fixed-Effects Model
 
 We estimate the parameters of the following fixed effects model:
 
@@ -99,16 +103,15 @@ summary(FEmodel3)
 
 ```{r fe_output_table, eval=FALSE, results="asis"}
 stargazer(FEmodel1, FEmodel2, FEmodel3, covariate.labels = c("T1LR", "T1LR * AA", "T1LR * His", "TE", "Small Business Loans", "ROA", "NPA", "ln(TA)", "Deposits", "Post Crisis", "Fin Crisis", "De Novo", "ln(TA) * ROA", "ln(TA) * NPA"), dep.var.labels = "% Change in Amt. SB Loans", digits = 3, no.space=TRUE, header=FALSE, type='latex', omit.stat=c("LL"), title = "All Banks: Determinants of the % Change in the Amount of Small-Business Loans", intercept.bottom = TRUE, notes = "Results are from fixed-effects models with bank fixed effects, for the years 2001 through 2017.  Data are quarterly.  The dependent variable is percent change in the amount of small-business loans.  Small-Business loans are defined as the sum of commercial, industrial, and commercial real-estate loans.  All variables are lagged one year relative to the dependent variable.")
-
 ```
 
 The model is estimated using the plm package in the R programming language.  Estimation is done via maximum likelihood.
 
-#### Prediction with the Fixed Effects Models
+### Prediction with the Fixed Effects Models
 
 
 
-### Deep and Wide Model
+## Deep and Wide Model
 
 We estimate the parameters of a deep and wide neural net model.  The model is implemented in Keras and using Tensorflow as a backend.
 We first load the tensorflow and keras libraries and the data.
@@ -147,7 +150,7 @@ cols_linear_feature <- feature_columns(
 
 ```
 
-```{r train_and_eval}
+```{r train_and_eval, cache = TRUE}
 model1 <- dnn_linear_combined_regressor(linear_feature_columns = cols_linear_feature, dnn_feature_columns = cols_dnn_feature, dnn_hidden_units = c(100, 50))
 
 model1 %>% train(panel_input_fn(train, num_epochs = 10))
@@ -156,7 +159,7 @@ model1 %>% evaluate(panel_input_fn(test))
 ```
 
 
-```{r eval=TRUE}
+```{r eval=TRUE, cache = TRUE}
 obs <- panel[(dim(panel)[1] - 100):dim(panel)[1], ]
 preds1 <- model1 %>% predict(panel_input_fn(obs))
 
@@ -164,7 +167,7 @@ true_values1 <- obs$totSBloans_Delt
 predictions1 <- unlist(preds1$predictions)
 ```
 
-```{r eval=TRUE}
+```{r eval=TRUE, cache = TRUE}
 cor.test(unlist(preds1$predictions), obs$totSBloans_Delt)
 sq_errors1 <- (true_values1 - predictions1)^2
 avg_error1 <- sum(sq_errors1) / (length(sq_errors1))
@@ -172,4 +175,4 @@ rmse <- sqrt(avg_error1)
 rmse
 ```
 
-## Conclusion
+# Conclusion
