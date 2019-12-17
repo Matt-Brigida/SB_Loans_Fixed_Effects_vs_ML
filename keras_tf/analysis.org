@@ -1,0 +1,88 @@
+#+TITLE: Panel Analysis Using Keras/Tensorflow
+
+
+* Introduction
+
+
+#+BEGIN_SRC python :session sess :cache no :exports none
+import tensorflow as tf
+import pandas as pd
+import numpy as np
+
+import rpy2.robjects as robjects
+from rpy2.robjects import pandas2ri
+pandas2ri.activate()
+#+END_SRC
+
+#+RESULTS:
+: count    209528.000000
+: mean          0.104703
+: std           0.038401
+: min          -0.097900
+: 25%           0.085114
+: 50%           0.097180
+: 75%           0.114800
+: max           0.999600
+: Name: t1_LR_lagged_1_year, dtype: float64
+
+
+* Data and Methods
+
+** Get the Data
+
+#+BEGIN_SRC python :session sess :results output :cache yes :exports results 
+readRDS = robjects.r['readRDS']
+panel = readRDS("../full_panel.rds")
+
+panel = pandas2ri.ri2py(panel)
+panel
+
+#+END_SRC
+
+#+RESULTS[cdfedf30288744ed709aa7f5e001a08e4da83aae]:
+#+begin_example
+
+>>> Traceback (most recent call last):
+  File "<stdin>", line 1, in <module>
+AttributeError: module 'rpy2.robjects.pandas2ri' has no attribute 'ri2py'
+theindex_panel   quarter   IDRSSD  total_assets_lagged_1_year  ...  de_novo  TETA_lagged_1_year  fin_crisis_ind  post_crisis_ind
+37-20010331            20010331_37  20010331       37                         NaN  ...      0.0                 NaN             0.0              0.0
+37-20010630            20010630_37  20010630       37                         NaN  ...      0.0                 NaN             0.0              0.0
+37-20010930            20010930_37  20010930       37                         NaN  ...      0.0                 NaN             0.0              0.0
+37-20011231            20011231_37  20011231       37                         NaN  ...      0.0                 NaN             0.0              0.0
+37-20020331            20020331_37  20020331       37                     65486.0  ...      0.0             0.17445             0.0              0.0
+...       ...      ...                         ...  ...      ...                 ...             ...              ...
+5143788-20160630  20160630_5143788  20160630  5143788                         NaN  ...      0.0                 NaN             0.0              0.0
+5143788-20160930  20160930_5143788  20160930  5143788                         NaN  ...      0.0                 NaN             0.0              0.0
+5143788-20161231  20161231_5143788  20161231  5143788                         NaN  ...      0.0                 NaN             0.0              0.0
+5143788-20170331  20170331_5143788  20170331  5143788                         NaN  ...      0.0                 NaN             0.0              0.0
+5143788-20170630  20170630_5143788  20170630  5143788                         NaN  ...      0.0                 NaN             0.0              0.0
+
+[710688 rows x 46 columns]
+#+end_example
+
+
+
+#+BEGIN_SRC python :session sess :results output :cache yes :exports results 
+cols = ["quarter", "totSBloans_Delt", "t1_LR_lagged_1_year", "tot_SB_loans_TA_lagged_1", "ROA_lagged_1", "NPA_TA_lagged_1", "total_assets_lagged_1_year", "TD_TA_lagged_1", "african_am_ind", "hispanic_ind", "de_novo", "TETA_lagged_1_year", "post_crisis_ind", "fin_crisis_ind"]
+
+panel = panel[cols]
+
+panel = panel[panel.totSBloans_Delt < 2]
+panel = panel[panel.t1_LR_lagged_1_year < 1]
+panel = panel[panel.TETA_lagged_1_year < 1]
+
+panel['log_TA_lagged_1'] = np.log(panel.total_assets_lagged_1_year)
+panel$aa_t1_int <- panel$african_am_ind * panel$t1_LR_lagged_1_year
+panel$h_t1_int <- panel$hispanic_ind * panel$t1_LR_lagged_1_year
+panel$log_TA_ROA <- log(panel$total_assets_lagged_1_year) * panel$ROA_lagged_1
+panel$log_TA_NPA <- log(panel$total_assets_lagged_1_year) * panel$NPA_TA_lagged_1
+
+
+## get rid of NAs
+
+panel <- panel[complete.cases(panel), ]
+
+## create orthogonalized total equity variable
+panel$TE_orthogonal <- lm(panel$TETA_lagged_1_year ~ panel$t1_LR_lagged_1_year)$resid
+#+END_SRC
