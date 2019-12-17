@@ -1,13 +1,25 @@
 #+TITLE: Panel Analysis Using Keras/Tensorflow
+#+SETUPFILE: https://fniessen.github.io/org-html-themes/setup/theme-readtheorg.setup
 
 
 * Introduction
 
+** Load Libraries
 
-#+BEGIN_SRC python :session sess :cache no :exports none
+#+BEGIN_SRC python :session sess :cache no :exports code
 import tensorflow as tf
+from tensorflow import keras
+from tensorflow.keras import layers
+
 import pandas as pd
 import numpy as np
+import statsmodels.formula.api as sm
+# import sklearn
+# from sklearn import linear_model
+import seaborn as sns
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 import rpy2.robjects as robjects
 from rpy2.robjects import pandas2ri
@@ -15,31 +27,23 @@ pandas2ri.activate()
 #+END_SRC
 
 #+RESULTS:
-: count    209528.000000
-: mean          0.104703
-: std           0.038401
-: min          -0.097900
-: 25%           0.085114
-: 50%           0.097180
-: 75%           0.114800
-: max           0.999600
-: Name: t1_LR_lagged_1_year, dtype: float64
 
 
 * Data and Methods
 
 ** Get the Data
 
-#+BEGIN_SRC python :session sess :results output :cache yes :exports results 
+Read in panel from local rds file.  File is also in github here.
+
+#+BEGIN_SRC python :session sess :results output :cache yes :exports both
 readRDS = robjects.r['readRDS']
 panel = readRDS("../full_panel.rds")
 
 panel = pandas2ri.ri2py(panel)
 panel
-
 #+END_SRC
 
-#+RESULTS[cdfedf30288744ed709aa7f5e001a08e4da83aae]:
+#+RESULTS[b19334e01f90ad07552efab84cad0fb0e62cfd34]:
 #+begin_example
 
 >>> Traceback (most recent call last):
@@ -73,16 +77,108 @@ panel = panel[panel.t1_LR_lagged_1_year < 1]
 panel = panel[panel.TETA_lagged_1_year < 1]
 
 panel['log_TA_lagged_1'] = np.log(panel.total_assets_lagged_1_year)
-panel$aa_t1_int <- panel$african_am_ind * panel$t1_LR_lagged_1_year
-panel$h_t1_int <- panel$hispanic_ind * panel$t1_LR_lagged_1_year
-panel$log_TA_ROA <- log(panel$total_assets_lagged_1_year) * panel$ROA_lagged_1
-panel$log_TA_NPA <- log(panel$total_assets_lagged_1_year) * panel$NPA_TA_lagged_1
+panel['aa_t1_int'] <- panel.african_am_ind * panel.t1_LR_lagged_1_year
+panel['h_t1_int'] <- panel.hispanic_ind * panel.t1_LR_lagged_1_year
+panel['log_TA_ROA'] <- log(panel.total_assets_lagged_1_year) * panel.ROA_lagged_1
+panel['log_TA_NPA'] <- log(panel.total_assets_lagged_1_year) * panel.NPA_TA_lagged_1
 
 
 ## get rid of NAs
 
-panel <- panel[complete.cases(panel), ]
-
-## create orthogonalized total equity variable
-panel$TE_orthogonal <- lm(panel$TETA_lagged_1_year ~ panel$t1_LR_lagged_1_year)$resid
+panel.dropna()
 #+END_SRC
+
+
+
+#+BEGIN_SRC python :session sess :results output :cache yes :exports both
+## create orthogonalized total equity variable
+panel['TE_orthogonal'] = sm.ols(formula="TETA_lagged_1_year ~ t1_LR_lagged_1_year", data=panel).fit().summary()
+
+sm.ols(formula="TETA_lagged_1_year ~ t1_LR_lagged_1_year", data=panel).fit().summary()
+#+END_SRC
+
+#+RESULTS[7c64c8b3b853a7d2586201397e496ca5455e9775]:
+#+begin_example
+
+>>> <class 'statsmodels.iolib.summary.Summary'>
+"""
+                            OLS Regression Results                            
+==============================================================================
+Dep. Variable:     TETA_lagged_1_year   R-squared:                       0.886
+Model:                            OLS   Adj. R-squared:                  0.886
+Method:                 Least Squares   F-statistic:                 1.632e+06
+Date:                Tue, 17 Dec 2019   Prob (F-statistic):               0.00
+Time:                        12:25:17   Log-Likelihood:             6.1387e+05
+No. Observations:              209526   AIC:                        -1.228e+06
+Df Residuals:                  209524   BIC:                        -1.228e+06
+Df Model:                           1                                         
+Covariance Type:            nonrobust                                         
+=======================================================================================
+                          coef    std err          t      P>|t|      [0.025      0.975]
+---------------------------------------------------------------------------------------
+Intercept               0.0103   8.22e-05    125.370      0.000       0.010       0.010
+t1_LR_lagged_1_year     0.9416      0.001   1277.409      0.000       0.940       0.943
+==============================================================================
+Omnibus:                   135413.468   Durbin-Watson:                   0.640
+Prob(Omnibus):                  0.000   Jarque-Bera (JB):        249429728.559
+Skew:                           1.555   Prob(JB):                         0.00
+Kurtosis:                     172.000   Cond. No.                         26.4
+==============================================================================
+
+Warnings:
+[1] Standard Errors assume that the covariance matrix of the errors is correctly specified.
+"""
+#+end_example
+
+
+
+** Split Into Test/Train 
+
+
+#+BEGIN_SRC python :session sess :results output :cache yes :exports both
+panel_train = panel.sample(frac=0.8,random_state=0)
+panel_test = panel.drop(panel_train.index)
+#+END_SRC
+
+#+RESULTS[82cb22381096d06a8c95104439f46b7560d06111]:
+
+
+** View Panel
+
+#+BEGIN_SRC python :session sess :results file :cache yes :exports both
+sns.pairplot(panel_train[["t1_LR_lagged_1_year", "african_am_ind", "NPA_TA_lagged_1", "ROA_lagged_1"]], diag_kind="kde")
+plt.savefig('images/myfig.png')
+#plt.plot()
+return 'images/myfig.png'
+#+END_SRC
+
+#+RESULTS[132e3367cde260ec22217901861ac1da0524f021]:
+[[file:<seaborn.axisgrid.PairGrid object at 0x7fcd99efeeb0>]]
+
+[[file:images/myfig.png]]
+
+
+** Normalize
+
+#+BEGIN_SRC python :session sess :results output :cache yes :exports both
+def norm(x):
+  return (x - train_stats['mean']) / train_stats['std']
+
+
+normed_train_data = norm(panel_train)
+normed_test_data = norm(panel_test)
+#+END_SRC
+
+#+RESULTS[7b14a913b47219cfd5eadd2204edfaccb304d481]:
+: 
+: ... >>> >>> Traceback (most recent call last):
+:   File "<stdin>", line 1, in <module>
+:   File "<stdin>", line 2, in norm
+: NameError: name 'train_stats' is not defined
+: Traceback (most recent call last):
+:   File "<stdin>", line 1, in <module>
+:   File "<stdin>", line 2, in norm
+: NameError: name 'train_stats' is not defined
+
+
+
